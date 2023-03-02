@@ -1,11 +1,12 @@
 import { error } from '@sveltejs/kit';
-import type { Contents } from 'newt-client-js';
+import type { Client, Contents } from 'newt-client-js';
 
-import { newtClient } from '$lib/server/newt';
+import { getNewtClient } from '$lib/server/newt';
 import type { ResearchContent, LibraryLink } from '$lib/server/newt';
+import type { PageServerLoad } from './$types';
 
-async function getResearchContent(slug: string): Promise<ResearchContent | null> {
-	return await newtClient.getFirstContent<ResearchContent>({
+async function getResearchContent(client: Client, slug: string): Promise<ResearchContent | null> {
+	return await client.getFirstContent<ResearchContent>({
 		appUid: 'exercise-date-library-js',
 		modelUid: 'research-content',
 		query: {
@@ -23,8 +24,8 @@ async function getResearchContent(slug: string): Promise<ResearchContent | null>
 	});
 }
 
-async function getLibraryLinks(slug: string): Promise<Contents<LibraryLink>> {
-	return await newtClient.getContents<LibraryLink>({
+async function getLibraryLinks(client: Client, slug: string): Promise<Contents<LibraryLink>> {
+	return await client.getContents<LibraryLink>({
 		appUid: 'exercise-date-library-js',
 		modelUid: 'library-link',
 		query: {
@@ -34,12 +35,16 @@ async function getLibraryLinks(slug: string): Promise<Contents<LibraryLink>> {
 	});
 }
 
-export async function load({ params }: { params: { slug: string } }) {
-	const researchContent = await getResearchContent(params.slug);
+export const load = (async ({ fetch, params }) => {
+	const response = await fetch('/api/cf/env');
+	const env = await response.json();
+	const client = getNewtClient(env.spaceUid, env.token);
+
+	const researchContent = await getResearchContent(client, params.slug);
 
 	if (!researchContent) throw error(404);
 
-	const libraryLinks = await getLibraryLinks(params.slug);
+	const libraryLinks = await getLibraryLinks(client, params.slug);
 
 	return {
 		content: researchContent,
@@ -48,4 +53,4 @@ export async function load({ params }: { params: { slug: string } }) {
 			others: libraryLinks.items.filter((x) => x.linkTo !== 'official')
 		}
 	};
-}
+}) satisfies PageServerLoad;

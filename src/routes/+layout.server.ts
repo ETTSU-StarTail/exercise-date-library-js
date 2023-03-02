@@ -1,10 +1,10 @@
-import type { Contents } from 'newt-client-js';
+import type { Client, Contents } from 'newt-client-js';
 
-import { newtClient } from '$lib/server/newt';
-import type { ResearchContent } from '$lib/server/newt';
+import { getNewtClient, type ResearchContent } from '$lib/server/newt';
+import type { LayoutServerLoad } from './$types';
 
-async function getResearchContents(): Promise<Contents<ResearchContent>> {
-	return await newtClient.getContents<ResearchContent>({
+async function getResearchContents(client: Client): Promise<Contents<ResearchContent>> {
+	return await client.getContents<ResearchContent>({
 		appUid: 'exercise-date-library-js',
 		modelUid: 'research-content',
 		query: {
@@ -13,10 +13,14 @@ async function getResearchContents(): Promise<Contents<ResearchContent>> {
 	});
 }
 
-export async function load() {
-	const researchContents = await getResearchContents();
+export const load = (async ({ fetch }) => {
+	const response = await fetch('/api/cf/env');
+	const env = await response.json();
+	const client = getNewtClient(env.spaceUid, env.token);
+
+	const researchContents = await getResearchContents(client);
 
 	return {
 		contents: researchContents.items
 	};
-}
+}) satisfies LayoutServerLoad;

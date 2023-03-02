@@ -7,7 +7,8 @@ declare global {
 		// interface PageData {}
 		interface Platform {
 			env: {
-				NEWT_TOKEN: DurableObjectNamespace;
+				NEWT_CDN_API_TOKEN: string;
+				NEWT_SPACE_UID: string;
 			};
 		}
 	}
