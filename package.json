@@ -38,6 +38,7 @@
 		"npm": "8.19.4"
 	},
 	"dependencies": {
-		"newt-client-js": "^3.2.4"
+		"newt-client-js": "^3.2.4",
+		"wrangler": "^2.12.0"
 	}
 }
