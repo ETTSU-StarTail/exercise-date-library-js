@@ -6,9 +6,9 @@ declare global {
 		// interface Locals {}
 		// interface PageData {}
 		interface Platform {
-			env: {
-				NEWT_CDN_API_TOKEN: string;
+			env?: {
 				NEWT_SPACE_UID: string;
+				NEWT_CDN_API_TOKEN: string;
 			};
 		}
 	}
