@@ -36,5 +36,8 @@
 	"volta": {
 		"node": "16.19.1",
 		"npm": "8.19.4"
+	},
+	"dependencies": {
+		"newt-client-js": "^3.2.4"
 	}
 }
